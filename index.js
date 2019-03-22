@@ -170,7 +170,6 @@ class Transaction {
   hash (includeSignature) {
     if (includeSignature === undefined) includeSignature = true
 
-
     let items
     if (includeSignature) {
       items = this.raw
@@ -181,10 +180,8 @@ class Transaction {
       // elements (i.e. nonce, gasprice, startgas, to, value, data), hash nine elements, with v replaced by
       // CHAIN_ID, r = 0 and s = 0.
 
-      const onSpuriousDragonOrLater = this._common.gteHardfork('spuriousDragon')
       const v = ethUtil.bufferToInt(this.v)
-      const vMeetsEIP155Conditions = v === this._chainId * 2 + 35 || v === this._chainId * 2 + 36
-      if (onSpuriousDragonOrLater && vMeetsEIP155Conditions) {
+      if (this.vMeetsEIP155Conditions(v)) {
         const raw = this.raw.slice()
         this.v = this._chainId
         this.r = 0
@@ -245,8 +242,7 @@ class Transaction {
 
     try {
       const v = ethUtil.bufferToInt(this.v)
-      const useChainIdWhileRecoveringPubKey = v >= this._chainId * 2 + 35 && this._common.gteHardfork('spuriousDragon')
-      this._senderPubKey = ethUtil.ecrecover(msgHash, v, this.r, this.s, useChainIdWhileRecoveringPubKey && this._chainId)
+      this._senderPubKey = ethUtil.ecrecover(msgHash, v, this.r, this.s, this.vMeetsEIP155Conditions(v) && this._chainId)
     } catch (e) {
       return false
     }
@@ -261,7 +257,7 @@ class Transaction {
   sign (privateKey) {
     const msgHash = this.hash(false)
     const sig = ethUtil.ecsign(msgHash, privateKey)
-    if (this._chainId > 0) {
+    if (this.vMeetsEIP155Conditions(sig.v)) {
       sig.v += this._chainId * 2 + 8
     }
     Object.assign(this, sig)
@@ -302,6 +298,16 @@ class Transaction {
     return new BN(this.gasLimit)
       .imul(new BN(this.gasPrice))
       .iadd(new BN(this.value))
+  }
+
+  /**
+    * Whether or not the v value is valid exclusively under the rules specified in EIP-155
+    * @return {boolean}
+    */
+  vMeetsEIP155Conditions (v) {
+    const vOptions = [this._chainId * 2 + 35, this._chainId * 2 + 35 + 1]
+    const hardforkGteSpuriousDragon = this._common.gteHardfork('spuriousDragon')
+    return hardforkGteSpuriousDragon && vOptions.includes(v)
   }
 
   /**

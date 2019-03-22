@@ -35,7 +35,7 @@ tape('TransactionTests', (t) => {
         const shouldBeInvalid = Object.keys(forkTestData).length === 0
         try {
           tx = new Tx(rawTx, {
-            hardfork: forkNameMap[forkName],
+            hardfork: forkNameMap[forkName]
           })
 
           const sender = tx.getSenderAddress().toString('hex')
