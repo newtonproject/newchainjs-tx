@@ -145,11 +145,6 @@ class Transaction {
       get: this.getSenderAddress.bind(this)
     })
 
-    // calculate chainId from signature
-    let sigV = ethUtil.bufferToInt(this.v)
-    let chainId = Math.floor((sigV - 35) / 2)
-    if (chainId < 0) chainId = 0
-
     // set chainId
     this._chainId = this._common.chainId()
   }
