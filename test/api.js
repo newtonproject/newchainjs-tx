@@ -186,19 +186,24 @@ tape('[Transaction]: Basic functions', function (t) {
   })
 
   t.test('sign tx with chainId specified in params', function (st) {
-    var tx = new Transaction({ chainId: 42 })
+    var tx = new Transaction(null, { chain: 42 })
     st.equal(tx.getChainId(), 42)
     var privKey = new Buffer(txFixtures[0].privateKey, 'hex')
     tx.sign(privKey)
-    var serialized = tx.serialize()
-    var reTx = new Transaction(serialized)
-    st.equal(reTx.verifySignature(), true)
-    st.equal(reTx.getChainId(), 42)
+    st.equal(tx.verifySignature(), true)
     st.end()
   })
 
   t.test('allow chainId more than 1 byte', function (st) {
-    var tx = new Transaction({ chainId: 0x16b2 })
+    var tx = new Transaction(null, { chain: {
+      chainId: 0x16b2,
+      networkId: 1,
+      genesis: {
+        '0x0ed76c2c3b5d50ff8fb50b3eeacd681590be1c2d': '100000000000000000000'
+      },
+      hardforks: ['byzantium', 'constantinople', 'petersburg'],
+      bootstrapNodes: [{}]
+    } })
     st.equal(tx.getChainId(), 0x16b2)
     st.end()
   })
