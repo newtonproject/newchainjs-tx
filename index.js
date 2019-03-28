@@ -1,10 +1,10 @@
 'use strict'
-const ethUtil = require('ethereumjs-util')
+const ethUtil = require('newchainjs-util')
 const Common = require('ethereumjs-common')
 const BN = ethUtil.BN
 
-// secp256k1n/2
-const N_DIV_2 = new BN('7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0', 16)
+// secp256r1n/2
+const N_DIV_2 = new BN('7fffffff800000007fffffffffffffffde737d56d38bcf4279dce5617e3192a8', 16)
 
 /**
  * Creates a new transaction object.
@@ -121,7 +121,7 @@ class Transaction {
      * @return {Buffer}
      * @memberof Transaction
      * @name serialize
-     * @see {@link https://github.com/ethereumjs/ethereumjs-util/blob/master/docs/index.md#defineproperties|ethereumjs-util}
+     * @see {@link https://github.com/ethereumjs/newchainjs-util/blob/master/docs/index.md#defineproperties|newchainjs-util}
      */
     /**
      * Returns the transaction in JSON format
@@ -129,7 +129,7 @@ class Transaction {
      * @return {Array | String}
      * @memberof Transaction
      * @name toJSON
-     * @see {@link https://github.com/ethereumjs/ethereumjs-util/blob/master/docs/index.md#defineproperties|ethereumjs-util}
+     * @see {@link https://github.com/ethereumjs/newchainjs-util/blob/master/docs/index.md#defineproperties|newchainjs-util}
      */
     // attached serialize
     ethUtil.defineProperties(this, fields, data)
@@ -233,7 +233,7 @@ class Transaction {
    */
   verifySignature () {
     const msgHash = this.hash(false)
-    // All transaction signatures whose s-value is greater than secp256k1n/2 are considered invalid.
+    // All transaction signatures whose s-value is greater than secp256r1n/2 are considered invalid.
     if (this._common.gteHardfork('homestead') && new BN(this.s).cmp(N_DIV_2) === 1) {
       return false
     }

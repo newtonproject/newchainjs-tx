@@ -1,5 +1,5 @@
 const tape = require('tape')
-const utils = require('ethereumjs-util')
+const utils = require('newchainjs-util')
 const Common = require('ethereumjs-common')
 const FakeTransaction = require('../fake.js')
 

@@ -1,6 +1,6 @@
 const Tx = require('../index.js')
 const tape = require('tape')
-const ethUtil = require('ethereumjs-util')
+const ethUtil = require('newchainjs-util')
 const Common = require('ethereumjs-common')
 const argv = require('minimist')(process.argv.slice(2))
 const testing = require('ethereumjs-testing')
